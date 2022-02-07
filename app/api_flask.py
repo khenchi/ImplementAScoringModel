@@ -19,8 +19,8 @@ y_train_df = df.pop('TARGET')
 X = pd.read_csv(os.path.join('data', 'X_valid_red.csv'))
 y_train = pd.read_csv(os.path.join('data', 'y_valid_red.csv'))
 
-with open(os.path.join('data', 'shap_values.pickle'), 'rb') as file:
-    shap_values = pickle.load(file)
+# with open(os.path.join('data', 'shap_values.pickle'), 'rb') as file:
+#     shap_values = pickle.load(file)
 
 ###############################################################
 # initiate Flask app
@@ -97,13 +97,13 @@ def get_feature_importance():
     return jsonify({'status': 'ok',
     		        'features_importances': features_importances}), 200
 
-# Get Shap Values                     
-@app.route('/get_shap_values/')
-def get_shap_values():
+# # Get Shap Values                     
+# @app.route('/get_shap_values/')
+# def get_shap_values():
 
-    shap_values_json =  json.loads(json.dumps(shap_values.tolist()))
-    return jsonify({'status': 'ok',
-                    'shap_values': shap_values_json}), 200
+#     shap_values_json =  json.loads(json.dumps(shap_values.tolist()))
+#     return jsonify({'status': 'ok',
+#                     'shap_values': shap_values_json}), 200
 
 # main function 
 if __name__ == "__main__":
