@@ -5,6 +5,8 @@ import pandas as pd
 from flask import Flask, jsonify, request
 import json
 from sklearn.neighbors import NearestNeighbors
+import xgboost
+import shap
 
 # Load 
 path = os.path.join('model', 'results_lgbm.pickle')
@@ -19,8 +21,11 @@ y_train_df = df.pop('TARGET')
 X = pd.read_csv(os.path.join('data', 'X_valid_red.csv'))
 y_train = pd.read_csv(os.path.join('data', 'y_valid_red.csv'))
 
-# with open(os.path.join('data', 'shap_values.pickle'), 'rb') as file:
-#     shap_values = pickle.load(file)
+y_train.columns
+
+X_shap = X.drop(columns=['SK_ID_CURR']).copy(deep=True)
+y_shap = y_train.drop(columns=['SK_ID_CURR']).copy(deep=True)
+y_train.columns
 
 ###############################################################
 # initiate Flask app
@@ -97,13 +102,17 @@ def get_feature_importance():
     return jsonify({'status': 'ok',
     		        'features_importances': features_importances}), 200
 
-# # Get Shap Values                     
-# @app.route('/get_shap_values/')
-# def get_shap_values():
-
-#     shap_values_json =  json.loads(json.dumps(shap_values.tolist()))
-#     return jsonify({'status': 'ok',
-#                     'shap_values': shap_values_json}), 200
+# Get Shap Values                     
+@app.route('/get_shap_values/')
+def get_shap_values():
+    model_clf = xgboost.XGBClassifier().fit(X_shap, y_shap)
+    explainer = shap.TreeExplainer(model_clf)
+    shap_values = explainer.shap_values(X_shap)
+    shap_values_json =  json.loads(json.dumps(shap_values.tolist()))
+    expected_value_json = json.loads(json.dumps(explainer.expected_value.tolist()))
+    return jsonify({'status': 'ok',
+                    'shap_values': shap_values_json,
+                    'expected_value_json': expected_value_json}), 200
 
 # main function 
 if __name__ == "__main__":
