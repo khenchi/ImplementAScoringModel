@@ -119,8 +119,8 @@ html_card_footer3="""
 #    l’ensemble des clients ou à un groupe de clients similaires.
 
 # URL de l'API
-# api_adress = "https://khalil-henchi-oc-p7-api.herokuapp.com/"
-api_adress = "http://127.0.0.1:5000/"
+api_adress = "https://khalil-henchi-oc-p7-api.herokuapp.com/"
+# api_adress = "http://127.0.0.1:5000/"
 # Liste des IDs des clients
 @st.cache
 def get_id_list():
