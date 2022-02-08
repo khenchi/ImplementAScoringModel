@@ -181,8 +181,8 @@ def get_shap_values():
     response = requests.get(api_adress + "get_shap_values/")
     content = json.loads(response.content)
     shap_values = np.array(content['shap_values'])
-    expected_value = content['expected_value_json']
-    return (shap_values, expected_value)
+    #expected_value = content['expected_value_json']
+    return shap_values, #expected_value)
 
 ### Block 0 #########################################################################################
 
@@ -197,7 +197,8 @@ temp_lst = df_sans_id.columns.to_list()
 cat_features = df_sans_id.select_dtypes(exclude=[np.number]).columns.to_list()
 num_features = df_sans_id.select_dtypes(include=[np.number]).columns.to_list()
 features_importances = get_features_importances()
-shap_values, expected_value = get_shap_values()
+#shap_values, expected_value = get_shap_values()
+shap_values = get_shap_values()
 
 
 with st.expander("Mission du dashboard"):
@@ -627,28 +628,28 @@ if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
                     # dpi=300,
                     # pad_inches=0,
                     )
-        if plot_type =='force': 
-          index = data.loc[data['SK_ID_CURR']==selected_id,:].index[0]       
-          # shap.initjs()
-          fig, axes = plt.subplots(nrows=1,
-                  ncols=1,
-                  figsize=(6, 5),
-                  ) 
-          shap.force_plot(expected_value,
-                          shap_values[index,:],
-                          data.drop(columns=['SK_ID_CURR']).iloc[index,:],
-                          show = False,
-                          link='logit', 
-                          matplotlib=True,
-                          figsize=(12,3) 
-                          )                                        
-          axes = plt.gcf()
+#         if plot_type =='force': 
+#           index = data.loc[data['SK_ID_CURR']==selected_id,:].index[0]       
+#           # shap.initjs()
+#           fig, axes = plt.subplots(nrows=1,
+#                   ncols=1,
+#                   figsize=(6, 5),
+#                   ) 
+#           shap.force_plot(expected_value,
+#                           shap_values[index,:],
+#                           data.drop(columns=['SK_ID_CURR']).iloc[index,:],
+#                           show = False,
+#                           link='logit', 
+#                           matplotlib=True,
+#                           figsize=(12,3) 
+#                           )                                        
+#           axes = plt.gcf()
 
-          st.pyplot(fig, 
-                    bbox_inches='tight', 
-                    dpi=300,
-                    pad_inches=0,
-                    )
+#           st.pyplot(fig, 
+#                     bbox_inches='tight', 
+#                     dpi=300,
+#                     pad_inches=0,
+#                     )
                     
       with col3:
         st.write("")
