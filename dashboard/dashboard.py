@@ -1,4 +1,5 @@
 # Import modules 
+import os
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -9,8 +10,10 @@ import shap
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import streamlit.components.v1 as components
 
 ########################################
+abs_path = os.path.dirname(os.path.realpath(__file__))
 html_header="""
 <head>
 <title>PHomeCredit</title>
@@ -21,7 +24,7 @@ html_header="""
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <h1 style="font-size:300%; color:#838383; font-family:Georgia"> Home Credit Default Risk Dashboard <br>
- <h2 style="font-size:50%; "color:#BFBCBC; font-family:Georgia"> Khalil Henchi </h2> <br></h1>
+ <h2 style="font-size:200%; "color:#BFBCBC; font-family:Georgia"> Khalil Henchi </h2> <br></h1>
 """
 
 st.set_page_config(page_title="Home Credit Default Risk Dashboard", page_icon="", layout="wide")
@@ -41,7 +44,7 @@ with st.container():
   with col3:
     st.write("")
   with col4: 
-    image = Image.open('logo.png')
+    image = Image.open(os.path.join(abs_path, 'logo.png'))
     st.image(image)
   with col5:
     st.write("")  
@@ -116,7 +119,8 @@ html_card_footer3="""
 #    l’ensemble des clients ou à un groupe de clients similaires.
 
 # URL de l'API
-api_adress = "https://khalil-henchi-oc-p7-api.herokuapp.com/"
+# api_adress = "https://khalil-henchi-oc-p7-api.herokuapp.com/"
+api_adress = "http://127.0.0.1:5000/"
 # Liste des IDs des clients
 @st.cache
 def get_id_list():
@@ -181,8 +185,12 @@ def get_shap_values():
     response = requests.get(api_adress + "get_shap_values/")
     content = json.loads(response.content)
     shap_values = np.array(content['shap_values'])
-    #expected_value = content['expected_value_json']
-    return shap_values, #expected_value)
+    expected_value = content['expected_value_json']
+    return (shap_values, expected_value)
+# Plot shap with streamlit 
+def st_shap(plot, height=None):
+    shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
+    components.html(shap_html, height=height)
 
 ### Block 0 #########################################################################################
 
@@ -197,8 +205,8 @@ temp_lst = df_sans_id.columns.to_list()
 cat_features = df_sans_id.select_dtypes(exclude=[np.number]).columns.to_list()
 num_features = df_sans_id.select_dtypes(include=[np.number]).columns.to_list()
 features_importances = get_features_importances()
-#shap_values, expected_value = get_shap_values()
-shap_values = get_shap_values()
+shap_values, expected_value = get_shap_values()
+# shap_values = get_shap_values()
 
 
 with st.expander("Mission du dashboard"):
@@ -592,10 +600,10 @@ if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
         st.write("")
       with col2:
         # Shap Values 
-        plot_type = st.selectbox('Vuillez choisir le plot à afficher', 
-                                   options=['bar', 'dot' ],)
+        plot_type = st.selectbox('Vuillez choisir le plot SHAP à afficher', 
+                                   options=['Force Plot', 'Bar Plot', 'Dot Plot' ],)
 
-        if plot_type =='bar': 
+        if plot_type =='Bar Plot': 
           fig, axes = plt.subplots(nrows=1,
                   ncols=1,
                   figsize=(6, 5),
@@ -612,7 +620,7 @@ if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
                     # dpi=300,
                     # pad_inches=0,
                     )
-        if plot_type =='dot':  
+        if plot_type =='Dot Plot':  
           fig, axes = plt.subplots(nrows=1,
               ncols=1,
               figsize=(6, 5),
@@ -628,28 +636,16 @@ if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
                     # dpi=300,
                     # pad_inches=0,
                     )
-#         if plot_type =='force': 
-#           index = data.loc[data['SK_ID_CURR']==selected_id,:].index[0]       
-#           # shap.initjs()
-#           fig, axes = plt.subplots(nrows=1,
-#                   ncols=1,
-#                   figsize=(6, 5),
-#                   ) 
-#           shap.force_plot(expected_value,
-#                           shap_values[index,:],
-#                           data.drop(columns=['SK_ID_CURR']).iloc[index,:],
-#                           show = False,
-#                           link='logit', 
-#                           matplotlib=True,
-#                           figsize=(12,3) 
-#                           )                                        
-#           axes = plt.gcf()
-
-#           st.pyplot(fig, 
-#                     bbox_inches='tight', 
-#                     dpi=300,
-#                     pad_inches=0,
-#                     )
+        if plot_type =='Force Plot': 
+          index = data.loc[data['SK_ID_CURR']==selected_id,:].index[0]       
+          # visualize the client prediction's explanation 
+          st_shap(shap.force_plot(expected_value, 
+                                  shap_values[index,:],
+                                  data.drop(columns=['SK_ID_CURR']).iloc[index,:],
+                                  )
+                                  )
+          # visualize the training set predictions
+          # st_shap(shap.force_plot(explainer.expected_value, shap_values, X), 400)
                     
       with col3:
         st.write("")
