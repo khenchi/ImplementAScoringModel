@@ -536,7 +536,7 @@ html_card_header10="""
 </div>
 """
 
-if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
+if st.checkbox("Afficher l'interprétation des résultats"):
   ### Block 7 #########################################################################################
   with st.container():
     col1, col2, col3 = st.columns([1,42,1])
@@ -593,7 +593,7 @@ if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
   """
   st.markdown(html_br, unsafe_allow_html=True)  
 
-  if 1: #st.checkbox("Analyse SHAP"):
+  if st.checkbox("Analyse SHAP"):
     with st.container():
       col1, col2, col3 = st.columns([1,32,1])
       with col1:
