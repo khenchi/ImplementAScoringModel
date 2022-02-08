@@ -112,7 +112,8 @@ def get_shap_values():
     expected_value_json = json.loads(json.dumps(explainer.expected_value.tolist()))
     return jsonify({'status': 'ok',
                     'shap_values': shap_values_json,
-                    'expected_value_json': expected_value_json}), 200
+                  #  'expected_value_json': expected_value_json}
+                  ), 200
 
 # main function 
 if __name__ == "__main__":
