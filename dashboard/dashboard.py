@@ -11,6 +11,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import streamlit.components.v1 as components
+import xgboost
 
 ########################################
 abs_path = os.path.dirname(os.path.realpath(__file__))
@@ -181,12 +182,18 @@ def get_features_importances():
 
 # Shap values
 @st.cache
-def get_shap_values():
-    response = requests.get(api_adress + "get_shap_values/", timeout=240)
-    content = json.loads(response.content)
-    shap_values = np.array(content['shap_values'])
-    expected_value = content['expected_value_json']
+def get_shap_values(X_shap, y_shap):
+      # Prepare SHAP Values 
+    model_clf = xgboost.XGBClassifier().fit(X_shap, y_shap)
+    explainer = shap.TreeExplainer(model_clf)
+    shap_values = explainer.shap_values(X_shap)
+    expected_value = explainer.expected_value
+    # response = requests.get(api_adress + "get_shap_values/")
+    # content = json.loads(response.content)
+    # shap_values = np.array(content['shap_values'])
+    # expected_value = content['expected_value_json']
     return (shap_values, expected_value)
+
 # Plot shap with streamlit 
 def st_shap(plot, height=None):
     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
@@ -199,13 +206,16 @@ def st_shap(plot, height=None):
 ### Block 1#########################################################################################
 liste_id = get_id_list()
 data, y_train = get_data() 
+X_shap = data.drop(columns=['SK_ID_CURR']).copy(deep=True)
+y_shap = y_train.drop(columns=['SK_ID_CURR']).copy(deep=True)
+
 df_sans_id = data.drop(columns=['SK_ID_CURR'])
 temp_lst = df_sans_id.columns.to_list()
 
 cat_features = df_sans_id.select_dtypes(exclude=[np.number]).columns.to_list()
 num_features = df_sans_id.select_dtypes(include=[np.number]).columns.to_list()
 features_importances = get_features_importances()
-shap_values, expected_value = get_shap_values()
+shap_values, expected_value = get_shap_values(X_shap, y_shap)
 # shap_values = get_shap_values()
 
 
