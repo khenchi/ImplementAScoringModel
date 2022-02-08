@@ -119,8 +119,8 @@ html_card_footer3="""
 #    l’ensemble des clients ou à un groupe de clients similaires.
 
 # URL de l'API
-# api_adress = "https://khalil-henchi-oc-p7-api.herokuapp.com/"
-api_adress = "http://127.0.0.1:5000/"
+api_adress = "https://khalil-henchi-oc-p7-api.herokuapp.com/"
+# api_adress = "http://127.0.0.1:5000/"
 # Liste des IDs des clients
 @st.cache
 def get_id_list():
@@ -182,7 +182,7 @@ def get_features_importances():
 # Shap values
 @st.cache
 def get_shap_values():
-    response = requests.get(api_adress + "get_shap_values/")
+    response = requests.get(api_adress + "get_shap_values/", timeout=240)
     content = json.loads(response.content)
     shap_values = np.array(content['shap_values'])
     expected_value = content['expected_value_json']
@@ -536,7 +536,7 @@ html_card_header10="""
 </div>
 """
 
-if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
+if st.checkbox("Afficher l'interprétation des résultats"):
   ### Block 7 #########################################################################################
   with st.container():
     col1, col2, col3 = st.columns([1,42,1])
@@ -593,7 +593,7 @@ if 1 : #st.checkbox("Afficher l'interprétation des résultats"):
   """
   st.markdown(html_br, unsafe_allow_html=True)  
 
-  if 1: #st.checkbox("Analyse SHAP"):
+  if st.checkbox("Analyse SHAP"):
     with st.container():
       col1, col2, col3 = st.columns([1,32,1])
       with col1:
