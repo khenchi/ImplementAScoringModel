@@ -23,6 +23,10 @@ y_train = pd.read_csv(os.path.join(abs_path, 'data', 'y_valid_red.csv'))
 X_shap = X.drop(columns=['SK_ID_CURR']).copy(deep=True)
 y_shap = y_train.drop(columns=['SK_ID_CURR']).copy(deep=True)
 
+# Prepare SHAP Values 
+model_clf = xgboost.XGBClassifier().fit(X_shap, y_shap)
+explainer = shap.TreeExplainer(model_clf)
+shap_values = explainer.shap_values(X_shap)
 ###############################################################
 # initiate Flask app
 app = Flask(__name__)
@@ -101,9 +105,6 @@ def get_feature_importance():
 # Get Shap Values                     
 @app.route('/get_shap_values/')
 def get_shap_values():
-    model_clf = xgboost.XGBClassifier().fit(X_shap, y_shap)
-    explainer = shap.TreeExplainer(model_clf)
-    shap_values = explainer.shap_values(X_shap)
     shap_values_json =  json.loads(json.dumps(shap_values.tolist()))
     expected_value_json = json.loads(json.dumps(explainer.expected_value.tolist()))
     return jsonify({'status': 'ok',
