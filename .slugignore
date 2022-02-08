@@ -1,0 +1,4 @@
+# Ignore these files when building Heroku app
+*.psd
+*.pdf
+*.ipynb

@@ -9,16 +9,17 @@ import xgboost
 import shap
 ###############################################################
 # Load 
-path = os.path.join('model', 'results_lgbm.pickle')
+abs_path = os.path.dirname(os.path.realpath(__file__))
+path = os.path.join(abs_path, 'model', 'results_lgbm.pickle')
 with open(path, 'rb') as file:
     model_obj = pickle.load(file)
 model = model_obj[1]
 thresh = 0.5
 # Load data
-df = pd.read_csv(os.path.join('data', 'df_red.csv'))
+df = pd.read_csv(os.path.join(abs_path,'data', 'df_red.csv'))
 y_train_df = df.pop('TARGET')
-X = pd.read_csv(os.path.join('data', 'X_valid_red.csv'))
-y_train = pd.read_csv(os.path.join('data', 'y_valid_red.csv'))
+X = pd.read_csv(os.path.join(abs_path, 'data', 'X_valid_red.csv'))
+y_train = pd.read_csv(os.path.join(abs_path, 'data', 'y_valid_red.csv'))
 X_shap = X.drop(columns=['SK_ID_CURR']).copy(deep=True)
 y_shap = y_train.drop(columns=['SK_ID_CURR']).copy(deep=True)
 
