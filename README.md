@@ -10,4 +10,4 @@
 -  An interactive dashboard.
 -  A folder in github including modelling, dashboard and the deployment source files.
 - A methodology note including the learning method, evaluation metrics, cost function, interpretability and limits.
-- A support to present the work done and the dashboard. 
+- A support to present the work done and the interactif dashboard. 
