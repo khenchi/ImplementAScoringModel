@@ -1,0 +1,5 @@
+This file contains URLs to 
+
+- API :  https://khalil-henchi-oc-p7-api.herokuapp.com/
+- Dashboard  : https://khalil-henchi-oc-p7-dashboard.herokuapp.com/
+- GitHub repository : https://github.com/khenchi/ImplementAScoringModel.git
